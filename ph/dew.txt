@@ -1,0 +1,361 @@
+Dbconnection.php
+<?php
+$host = "localhost";
+$username = "root";
+$password = "";
+$database = "students";
+
+$connect = mysqli_connect($host, $username, $password, $database);
+
+if (!$connect) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+?>
+
+
+
+
+
+students.sql
+CREATE DATABASE students;
+
+USE students;
+
+CREATE TABLE registration (
+    StudentID VARCHAR(15) PRIMARY KEY,
+    UserName VARCHAR(40),
+    Password VARCHAR(30)
+);
+
+<?php
+    $connect = mysqli_connect("localhost", "root", "", "") or die("Connection Error");
+    mysqli_query($connect, "CREATE DATABASE students");
+    mysqli_select_db($connect, "students");
+    mysqli_query($connect, "CREATE TABLE registration (
+        StudentID VARCHAR(15) PRIMARY KEY,
+        UserName VARCHAR(40),
+        Password VARCHAR(30)
+    )");
+    echo "Database and table created successfully";
+?>
+
+
+
+
+
+
+
+registration.php
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Registration</title>
+</head>
+<body>
+    <h2>Student Registration</h2>
+    <form method="post" action="register.php">
+        <label>Student ID:</label>
+        <input type="text" name="student_id" required><br><br>
+
+        <label>User Name:</label>
+        <input type="text" name="username" required><br><br>
+
+        <label>Password:</label>
+        <input type="password" name="password" required><br><br>
+
+        <input type="submit" name="submit" value="Register">
+    </form>
+</body>
+</html>
+
+
+
+
+
+register.php
+<?php
+include 'Dbconnection.php';
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $student_id = $_POST['student_id'];
+    $user_name = $_POST['username'];
+    $password = $_POST['password'];
+
+    $sql = "INSERT INTO registration (StudentID, UserName, Password)
+            VALUES ('$student_id', '$user_name', '$password')";
+
+    if (mysqli_query($connect, $sql)) {
+        echo "New record created successfully.<br>";
+        echo "<a href='login.php'>Click here to Login</a>";
+    } else {
+        echo "Error: " . mysqli_error($connect);
+    }
+}
+
+mysqli_close($connect);
+?>
+
+
+
+
+
+login.php
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+</head>
+<body>
+    <h2>Login</h2>
+    <form method="post" action="authenticate.php">
+        <label>User Name:</label>
+        <input type="text" name="username" required><br><br>
+
+        <label>Password:</label>
+        <input type="password" name="password" required><br><br>
+
+        <input type="submit" name="login" value="Login">
+    </form>
+</body>
+</html>
+
+
+
+
+
+
+authenticate.php
+<?php
+session_start();
+include 'Dbconnection.php';
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $user_name = $_POST['username'];
+    $password = $_POST['password'];
+
+    $sql = "SELECT * FROM registration WHERE UserName='$user_name' AND Password='$password'";
+    $result = mysqli_query($connect, $sql);
+
+    if (mysqli_num_rows($result) > 0) {
+        $_SESSION["username"] = $user_name;
+        header("Location: welcome.php");
+    } else {
+        echo "Invalid credentials. <a href='login.php'>Try Again</a>";
+    }
+}
+
+mysqli_close($connect);
+?>
+
+
+
+
+
+welcome.php
+<?php
+session_start();
+if (!isset($_SESSION["username"])) {
+    header("Location: login.php");
+    exit();
+}
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Welcome</title>
+</head>
+<body>
+    <h2>Welcome, <?php echo $_SESSION["username"]; ?>!</h2>
+    <a href="logout.php">Logout</a>
+</body>
+</html>
+
+
+
+
+
+logout.php
+<?php
+session_start();
+session_destroy();
+header("Location: login.php");
+exit();
+?>
+
+
+
+
+
+
+---------------------------------------------------------------------------
+
+
+1. Bubble Sort
+function bubbleSort($arr) {
+    $n = count($arr);
+    for ($i = 0; $i < $n - 1; $i++) {
+        for ($j = 0; $j < $n - $i - 1; $j++) {
+            if ($arr[$j] > $arr[$j + 1]) {
+                // Swap elements
+                $temp = $arr[$j];
+                $arr[$j] = $arr[$j + 1];
+                $arr[$j + 1] = $temp;
+            }
+        }
+    }
+    return $arr;
+}
+
+$arr = [64, 34, 25, 12, 22, 11, 90];
+print_r(bubbleSort($arr));
+
+
+
+
+2. Selection Sort
+function selectionSort($arr) {
+    $n = count($arr);
+    for ($i = 0; $i < $n - 1; $i++) {
+        $minIndex = $i;
+        for ($j = $i + 1; $j < $n; $j++) {
+            if ($arr[$j] < $arr[$minIndex]) {
+                $minIndex = $j;
+            }
+        }
+        // Swap elements
+        $temp = $arr[$minIndex];
+        $arr[$minIndex] = $arr[$i];
+        $arr[$i] = $temp;
+    }
+    return $arr;
+}
+
+$arr = [64, 25, 12, 22, 11];
+print_r(selectionSort($arr));
+
+
+
+
+3. Insertion Sort
+function insertionSort($arr) {
+    $n = count($arr);
+    for ($i = 1; $i < $n; $i++) {
+        $key = $arr[$i];
+        $j = $i - 1;
+        while ($j >= 0 && $arr[$j] > $key) {
+            $arr[$j + 1] = $arr[$j];
+            $j--;
+        }
+        $arr[$j + 1] = $key;
+    }
+    return $arr;
+}
+
+$arr = [12, 11, 13, 5, 6];
+print_r(insertionSort($arr));
+
+
+
+
+
+4. Merge Sort
+function mergeSort($arr) {
+    if (count($arr) <= 1) return $arr;
+
+    $mid = floor(count($arr) / 2);
+    $left = array_slice($arr, 0, $mid);
+    $right = array_slice($arr, $mid);
+
+    return merge(mergeSort($left), mergeSort($right));
+}
+
+function merge($left, $right) {
+    $result = [];
+    $i = $j = 0;
+
+    while ($i < count($left) && $j < count($right)) {
+        if ($left[$i] < $right[$j]) {
+            $result[] = $left[$i++];
+        } else {
+            $result[] = $right[$j++];
+        }
+    }
+
+    return array_merge($result, array_slice($left, $i), array_slice($right, $j));
+}
+
+$arr = [38, 27, 43, 3, 9, 82, 10];
+print_r(mergeSort($arr));
+
+
+
+
+
+5. Quick Sort
+function quickSort($arr) {
+    if (count($arr) < 2) return $arr;
+
+    $pivot = $arr[0];
+    $left = $right = [];
+
+    for ($i = 1; $i < count($arr); $i++) {
+        if ($arr[$i] < $pivot) {
+            $left[] = $arr[$i];
+        } else {
+            $right[] = $arr[$i];
+        }
+    }
+
+    return array_merge(quickSort($left), [$pivot], quickSort($right));
+}
+
+$arr = [10, 7, 8, 9, 1, 5];
+print_r(quickSort($arr));
+
+
+
+
+
+6. Heap Sort
+function heapSort(&$arr) {
+    $n = count($arr);
+
+    for ($i = floor($n / 2) - 1; $i >= 0; $i--) {
+        heapify($arr, $n, $i);
+    }
+
+    for ($i = $n - 1; $i > 0; $i--) {
+        $temp = $arr[0];
+        $arr[0] = $arr[$i];
+        $arr[$i] = $temp;
+
+        heapify($arr, $i, 0);
+    }
+}
+
+function heapify(&$arr, $n, $i) {
+    $largest = $i;
+    $left = 2 * $i + 1;
+    $right = 2 * $i + 2;
+
+    if ($left < $n && $arr[$left] > $arr[$largest]) {
+        $largest = $left;
+    }
+
+    if ($right < $n && $arr[$right] > $arr[$largest]) {
+        $largest = $right;
+    }
+
+    if ($largest != $i) {
+        $temp = $arr[$i];
+        $arr[$i] = $arr[$largest];
+        $arr[$largest] = $temp;
+
+        heapify($arr, $n, $largest);
+    }
+}
+
+$arr = [12, 11, 13, 5, 6, 7];
+heapSort($arr);
+print_r($arr);

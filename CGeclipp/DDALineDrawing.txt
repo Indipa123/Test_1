@@ -1,0 +1,151 @@
+import java.awt.*;
+import javax.swing.*;
+public class DDALineDrawing extends JPanel {
+
+ public void paint(Graphics g) {
+	 
+ int x1 = 50, y1 = 50, x2 = 300, y2 = 200;
+ drawDDA(g, x1, y1, x2, y2);
+ }
+
+ 
+ public void drawDDA(Graphics g, int x1, int y1, int x2, int y2) {
+ int dx = x2 - x1; 
+ int dy = y2 - y1; 
+ int steps = Math.max(Math.abs(dx), Math.abs(dy)); 
+
+ 
+ float x_inc = (float) dx / steps;
+ float y_inc = (float) dy / steps;
+
+ float x = x1;
+ float y = y1;
+
+ 
+ for (int i = 0; i <= steps; i++) {
+
+ 
+g.fillRect(Math.round(x), Math.round(y), 2, 2);
+
+ x += x_inc;
+ y += y_inc;
+ }
+ }
+
+ 
+ public static void main(String[] args) {
+ 
+ JFrame frame = new JFrame("DDA Line Drawing Algorithm");
+ DDALineDrawing panel = new DDALineDrawing();
+ frame.add(panel);
+ frame.setSize(400, 400);
+ frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+ frame.setVisible(true);
+ }
+}
+
+
+================
+
+import java.awt.*;
+import javax.swing.*;
+
+public class DDAFlag extends JPanel {
+    @Override
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+
+        g.setColor(Color.BLACK);
+        drawDDA(g, 200, 300, 200, 100); // Flag pole
+
+        g.setColor(Color.RED);
+        drawDDA(g, 200, 100, 300, 100); // Flag top
+        drawDDA(g, 300, 100, 300, 150); // Flag right
+        drawDDA(g, 200, 150, 300, 150); // Flag bottom
+        drawDDA(g, 200, 100, 200, 150); // Flag left
+    }
+
+    public void drawDDA(Graphics g, int x1, int y1, int x2, int y2) {
+        int dx = x2 - x1, dy = y2 - y1;
+        int steps = Math.max(Math.abs(dx), Math.abs(dy));
+
+        float x_inc = (float) dx / steps;
+        float y_inc = (float) dy / steps;
+        float x = x1, y = y1;
+
+        for (int i = 0; i <= steps; i++) {
+            g.fillRect(Math.round(x), Math.round(y), 2, 2);
+            x += x_inc;
+            y += y_inc;
+        }
+    }
+
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("Flag using DDA Algorithm");
+        DDAFlag panel = new DDAFlag();
+        frame.add(panel);
+        frame.setSize(500, 500);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+    }
+}
+
+=============
+
+package first;
+import java.awt.*;
+import javax.swing.*;
+
+public class DDAHouse extends JPanel {
+    @Override
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        g.setColor(Color.YELLOW);
+
+        drawDDA(g, 100, 200, 300, 200); // Bottom wall
+        drawDDA(g, 100, 200, 100, 100); // Left wall
+        drawDDA(g, 300, 200, 300, 100); // Right wall
+        drawDDA(g, 100, 100, 200, 50);  // Left roof
+        drawDDA(g, 200, 50, 300, 100);  // Right roof
+
+        g.setColor(Color.BLUE);
+        drawDDA(g, 140, 120, 170, 120); // Left window top
+        drawDDA(g, 140, 120, 140, 150); // Left window left
+        drawDDA(g, 140, 150, 170, 150); // Left window bottom
+        drawDDA(g, 170, 120, 170, 150); // Left window right
+
+        drawDDA(g, 230, 120, 260, 120); // Right window top
+        drawDDA(g, 230, 120, 230, 150); // Right window left
+        drawDDA(g, 230, 150, 260, 150); // Right window bottom
+        drawDDA(g, 260, 120, 260, 150); // Right window right
+
+        g.setColor(Color.GREEN);
+        drawDDA(g, 180, 200, 180, 150); // Left door line
+        drawDDA(g, 220, 200, 220, 150); // Right door line
+        drawDDA(g, 180, 150, 220, 150); // Top door line
+    }
+
+    public void drawDDA(Graphics g, int x1, int y1, int x2, int y2) {
+        int dx = x2 - x1, dy = y2 - y1;
+        int steps = Math.max(Math.abs(dx), Math.abs(dy));
+
+        float x_inc = (float) dx / steps;
+        float y_inc = (float) dy / steps;
+        float x = x1, y = y1;
+
+        for (int i = 0; i <= steps; i++) {
+            g.fillRect(Math.round(x), Math.round(y), 2, 2);
+            x += x_inc;
+            y += y_inc;
+        }
+    }
+
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("House using DDA Algorithm");
+        DDAHouse panel = new DDAHouse();
+        frame.add(panel);
+        frame.setSize(500, 500);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+    }
+}

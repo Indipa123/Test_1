@@ -1,0 +1,125 @@
+package first;
+import javax.swing.*;
+import java.awt.*;
+
+public class BresenhamCircle extends JPanel {
+
+    public void paint(Graphics g) {
+        drawBresenhamCircle(g, 200, 200, 100);
+    }
+
+    private void drawBresenhamCircle(Graphics g, int xc, int yc, int r) {
+        int x = 0, y = r;
+        int d = 3 - 2 * r; // Initial decision parameter
+        plotPoints(g, xc, yc, x, y);
+        
+        while (y >= x) {
+            x++;
+            if (d > 0) {
+                y--;
+                d = d + 4 * (x - y) + 10;
+            } else {
+                d = d + 4 * x + 6;
+            }
+            plotPoints(g, xc, yc, x, y);
+        }
+    }
+
+    private void plotPoints(Graphics g, int xc, int yc, int x, int y) {
+        g.fillRect(xc + x, yc + y, 2, 2);
+        g.fillRect(xc - x, yc + y, 2, 2);
+        g.fillRect(xc + x, yc - y, 2, 2);
+        g.fillRect(xc - x, yc - y, 2, 2);
+        g.fillRect(xc + y, yc + x, 2, 2);
+        g.fillRect(xc - y, yc + x, 2, 2);
+        g.fillRect(xc + y, yc - x, 2, 2);
+        g.fillRect(xc - y, yc - x, 2, 2);
+    }
+
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("Bresenham Circle Algorithm");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(500, 500);
+        BresenhamCircle panel = new BresenhamCircle();
+        frame.add(panel);
+        frame.setVisible(true);
+    }
+}
+
+=================
+
+package first;
+import java.awt.*;
+import javax.swing.*;
+
+public class Exercise01 extends JPanel {
+
+    public void paint(Graphics g) {
+        drawBresenhamCircle(g, 200, 200, 100); // Smiley Face
+        drawBresenhamCircle(g, 170, 170, 15);  // Left Eye
+        drawBresenhamCircle
+(g, 230, 170, 15);  // Right Eye
+        g.drawArc(160, 180, 80, 50, 0, -180);  // Smile
+
+        // Flower
+        drawBresenhamCircle(g, 350, 100, 30);  // Center
+        drawBresenhamCircle(g, 380, 100, 30);  // Right Petal
+        drawBresenhamCircle(g, 320, 100, 
+30);  // Left Petal
+        drawBresenhamCircle(g, 350, 130, 30);  // Bottom Petal
+        drawBresenhamCircle(g, 350, 70, 30);   // Top Petal
+
+        // Cloud
+        drawBresenhamCircle(g, 100, 300, 30);
+        drawBresenhamCircle(g, 130, 290, 30);
+        drawBresenhamCircle(g, 160, 300, 30);
+        drawBresenhamCircle(g, 140, 320, 30);
+
+        // Mickey Mouse
+        drawBresenhamCircle(g, 280, 250, 40); // Head
+        drawBresenhamCircle(g, 250, 220, 20); // Left Ear
+        drawBresenhamCircle(g, 310, 220, 20); // Right Ear
+
+        // Venn Diagram
+        drawBresenhamCircle(g, 400, 250, 50);
+        drawBresenhamCircle(g, 440, 250, 50);
+        drawBresenhamCircle(g, 420, 280, 50);
+    }
+
+    private void drawBresenhamCircle(Graphics g, int xc, int yc, int r) {
+        int x = 0, y = r;
+        int d = 3 - 2 * r;
+        plotPoints(g, xc, yc, x, y);
+
+        while (y >= x) {
+            x++;
+            if (d > 0) {
+                y--;
+                d = d + 4 * (x - y) + 10;
+            } else {
+                d = d + 4 * x + 6;
+            }
+            plotPoints(g, xc, yc, x, y);
+        }
+    }
+
+    private void plotPoints(Graphics g, int xc, int yc, int x, int y) {
+        g.fillRect(xc + x, yc + y, 2, 2);
+        g.fillRect(xc - x, yc + y, 2, 2);
+        g.fillRect(xc + x, yc - y, 2, 2);
+        g.fillRect(xc - x, yc - y, 2, 2);
+        g.fillRect(xc + y, yc + x, 2, 2);
+        g.fillRect(xc - y, yc + x, 2, 2);
+        g.fillRect(xc + y, yc - x, 2, 2);
+        g.fillRect(xc - y, yc - x, 2, 2);
+    }
+
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("Bresenham Circle Algorithm");
+        Exercise01 panel = new Exercise01();
+        frame.add(panel);
+        frame.setSize(600, 600);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+    }
+}

@@ -1,0 +1,518 @@
+package lab;
+import javax.swing.*;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+public class MovingCar extends JPanel {
+
+    private int car1X = 50, c1_dx = 5;
+    private int car2X = 750, c2_dx = 5;
+    private List<Bird> birdsLeft = new ArrayList<>();
+    private List<Bird> birdsRight = new ArrayList<>();
+    private List<Raindrop> rain = new ArrayList<>();
+    private final int delay = 50;
+    private Random random = new Random();
+    private int cloud_dx = (int)(Math.random() - 2);
+    private int[] cloud_x = {50, 300, 750};
+
+    public MovingCar() {
+        for (int i = 0; i < 3; i++)
+            birdsLeft.add(new Bird(random.nextInt(200), 50 + random.nextInt(50), true));
+        for (int i = 0; i < 5; i++)
+            birdsRight.add(new Bird(500 + random.nextInt(100), 50 + random.nextInt(50), false));
+        for (int i = 0; i < 100; i++)
+            rain.add(new Raindrop(random.nextInt(800), random.nextInt(400)));
+
+        Timer timer = new Timer(delay, e -> {
+            car1X += c1_dx;
+            car2X -= c2_dx;
+
+            if (car1X > getWidth()) car1X = -100;
+            if (car2X < -100) car2X = getWidth();
+
+            for (int i = 0; i < cloud_x.length; i++) {
+                cloud_x[i] += cloud_dx;
+                if (cloud_x[i] > 800) cloud_x[i] = -10;
+            }
+
+            for (Bird bird : birdsLeft) {
+                bird.x += 3;
+                if (bird.x > getWidth()) bird.x = -50;
+            }
+            for (Bird bird : birdsRight) {
+                bird.x -= 3;
+                if (bird.x < -50) bird.x = getWidth();
+            }
+
+            for (Raindrop drop : rain) {
+                drop.y += 8;
+                if (drop.y > getHeight()) {
+                    drop.y = 0;
+                    drop.x = random.nextInt(getWidth());
+                }
+            }
+
+            repaint();
+        });
+        timer.start();
+    }
+
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+
+        // Sky
+        g.setColor(new Color(176, 224, 230));
+        paintBox(0, 0, getWidth(), getHeight(), g);
+
+        // Road
+        g.setColor(Color.BLACK);
+        paintBox(0, getHeight() - 100, getWidth(), 100, g);
+
+        // Road Markings
+        g.setColor(Color.WHITE);
+        for (int i = 0; i < getWidth(); i += 60) {
+            paintBox(i, getHeight() - 60, 30, 5, g);
+        }
+
+        // Trees
+        drawTree(g, 50, getHeight() - 200);
+        drawTree(g, 150, getHeight() - 200);
+        drawTree(g, 250, getHeight() - 200);
+        drawTree(g, 550, getHeight() - 200);
+        drawTree(g, 650, getHeight() - 200);
+
+        // Clouds
+        drawCloud(g, cloud_x[0], 40);
+        drawCloud(g, cloud_x[1], 50);
+        drawCloud(g, cloud_x[2], 60);
+
+        // Sun
+        g.setColor(Color.YELLOW);
+        paintCircle(600, 40, 37, g);
+
+        // Birds
+        g.setColor(Color.BLACK);
+        for (Bird bird : birdsLeft) drawBird(g, bird.x, bird.y);
+        for (Bird bird : birdsRight) drawBird(g, bird.x, bird.y);
+
+        // Cars
+        g.setColor(Color.RED);
+        drawCar(g, car1X, getHeight() - 110);
+        g.setColor(Color.BLUE);
+        drawCar(g, car2X, getHeight() - 40);
+
+        // Rain
+        g.setColor(Color.WHITE);
+        for (Raindrop drop : rain) {
+            drawLine(drop.x, drop.y, drop.x, drop.y + 5, g);
+        }
+    }
+
+    private void drawTree(Graphics g, int x, int y) {
+        g.setColor(new Color(139, 69, 19)); // Brown trunk
+        paintBox(x + 20, y + 60, 10, 40, g);
+
+        int x1 = x + 25;
+        int y1 = y + 60;
+
+        g.setColor(Color.GREEN);
+        paintTriangle(x1 - 30, y1, x1 + 30, y1, x1, y1 - 100, g);
+    }
+
+    private void drawCloud(Graphics g, int x, int y) {
+        g.setColor(Color.WHITE);
+        paintCircle(x, y + 5, 20, g);
+        paintCircle(x + 15, y, 20, g);
+        paintCircle(x - 15, y, 20, g);
+        paintCircle(x + 10, y - 10, 20, g);
+        paintCircle(x - 10, y - 10, 20, g);
+    }
+
+    private void drawBird(Graphics g, int x, int y) {
+        drawLine(x, y, x + 10, y - 10, g);
+        drawLine(x + 10, y - 10, x + 20, y, g);
+    }
+
+    private void drawCar(Graphics g, int x, int y) {
+        paintBox(x, y, 80, 20, g);
+        paintBox(x + 10, y - 20, 60, 20, g);
+
+        Color wheel = Color.DARK_GRAY;
+        g.setColor(wheel);
+        paintCircle(x + 15, y + 20, 10, g);
+        paintCircle(x + 65, y + 20, 10, g);
+    }
+
+    private static class Bird {
+        int x, y;
+        boolean goingLeft;
+
+        public Bird(int x, int y, boolean goingLeft) {
+            this.x = x;
+            this.y = y;
+            this.goingLeft = goingLeft;
+        }
+    }
+
+    private static class Raindrop {
+        int x, y;
+
+        public Raindrop(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+    }
+
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("Car Animation with Trees, Clouds, and Rain");
+        frame.add(new MovingCar());
+        frame.setSize(800, 400);
+        frame.setResizable(false);
+        frame.setLocationRelativeTo(null);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+    }
+
+    public static void paintBox(int x1, int y1, int width, int height, Graphics g) {
+        for (int i = 0; i < height; i++) {
+            drawLine(x1, y1 + i, x1 + width, y1 + i, g);
+        }
+    }
+
+    public static void drawLine(int x1, int y1, int x2, int y2, Graphics g) {
+        int dx = x2 - x1, dy = y2 - y1;
+        int steps = Math.max(Math.abs(dx), Math.abs(dy));
+
+        double inc_x = (double) dx / steps;
+        double inc_y = (double) dy / steps;
+
+        double x = x1;
+        double y = y1;
+
+        for (int i = 0; i <= steps; i++) {
+            g.fillRect((int) Math.round(x), (int) Math.round(y), 2, 2);
+            x += inc_x;
+            y += inc_y;
+        }
+    }
+
+    public static void paintCircle(int cx, int cy, int r, Graphics g) {
+        int x = 0, y = r;
+        int p = 1 - r;
+
+        while (x <= y) {
+            int[] x_p = {cx + x, cx + x, cx - x, cx - x, cx + y, cx + y, cx - y, cx - y};
+            int[] y_p = {cy + y, cy - y, cy + y, cy - y, cy + x, cy - x, cy + x, cy - x};
+
+            for (int i = 0; i < 8; i++) {
+                g.fillRect(x_p[i], y_p[i], 2, 2);
+                drawLine(x_p[i], y_p[i], cx, cy, g);
+            }
+
+            x++;
+
+            if (p < 0) {
+                p += 2 * x + 1;
+            } else {
+                y--;
+                p += 2 * (x - y) + 1;
+            }
+        }
+    }
+
+    public static void paintTriangle(int x1, int y1, int x2, int y2, int cx, int cy, Graphics g) {
+        if (y1 > y2) {
+            int tempX = x1, tempY = y1;
+            x1 = x2; y1 = y2;
+            x2 = tempX; y2 = tempY;
+        }
+        if (y1 > cy) {
+            int tempX = x1, tempY = y1;
+            x1 = cx; y1 = cy;
+            cx = tempX; cy = tempY;
+        }
+        if (y2 > cy) {
+            int tempX = x2, tempY = y2;
+            x2 = cx; y2 = cy;
+            cx = tempX; cy = tempY;
+        }
+
+        for (int y = y1; y <= cy; y++) {
+            int startX = interpolateX(x1, y1, cx, cy, y);
+            int endX;
+            if (y < y2) {
+                endX = interpolateX(x1, y1, x2, y2, y);
+            } else {
+                endX = interpolateX(x2, y2, cx, cy, y);
+            }
+
+            if (startX > endX) {
+                int temp = startX;
+                startX = endX;
+                endX = temp;
+            }
+
+            drawLine(startX, y, endX, y, g);
+        }
+    }
+
+    private static int interpolateX(int x1, int y1, int x2, int y2, int currentY) {
+        if (y1 == y2) return x1;
+        double slope = (double) (x2 - x1) / (y2 - y1);
+        return (int) (x1 + slope * (currentY - y1));
+    }
+}
+
+
+==============================
+
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+public class MovingCar extends JPanel {
+
+    private int car1X = 50, c1_dx = 5;
+    private int car2X = 750, c2_dx = 5;
+    private List<Bird> birdsLeft = new ArrayList<>();
+    private List<Bird> birdsRight = new ArrayList<>();
+    private final int delay = 50;
+    private Random random = new Random();
+    private int cloud_dx = (int)(Math.random() - 2);
+    private int[] cloud_x = {50, 300, 750};
+
+    public MovingCar() {
+        for (int i = 0; i < 3; i++)
+            birdsLeft.add(new Bird(random.nextInt(200), 50 + random.nextInt(50), true));
+        for (int i = 0; i < 5; i++)
+            birdsRight.add(new Bird(500 + random.nextInt(100), 50 + random.nextInt(50), false));
+
+        Timer timer = new Timer(delay, e -> {
+        	car1X += c1_dx;
+        	car2X -= c2_dx;
+        	
+        	if (car1X > getWidth()) car1X = -100;
+            if (car2X < -100) car2X = getWidth();
+            
+            for(int i = 0; i < cloud_x.length; i++) {
+            	cloud_x[i] += cloud_dx;
+            	if(cloud_x[i] > 800) cloud_x[i] = -10;
+            }
+            
+
+            for (Bird bird : birdsLeft) {
+                bird.x += 3;
+                if (bird.x > getWidth()) bird.x = -50;
+            }
+            for (Bird bird : birdsRight) {
+                bird.x -= 3;
+                if (bird.x < -50) bird.x = getWidth();
+            }
+
+            repaint();
+        });
+        timer.start();
+    }
+
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+
+        // Sky
+        g.setColor(new Color(176, 224, 230));
+        paintBox(0, 0, getWidth(), getHeight(), g);
+
+        // Road
+        g.setColor(Color.BLACK);
+        paintBox(0, getHeight() - 100, getWidth(), 100, g);
+
+        // Road Markings
+        g.setColor(Color.WHITE);
+        for (int i = 0; i < getWidth(); i += 60) {
+            paintBox(i, getHeight() - 60, 30, 5, g);
+        }
+
+        // Trees (near the road)
+        drawTree(g, 50, getHeight() - 200);
+        drawTree(g, 150,getHeight() - 200 );
+        drawTree(g, 250, getHeight() - 200);
+        drawTree(g, 550, getHeight() - 200);
+        drawTree(g, 650, getHeight() - 200);
+
+        // Clouds
+        drawCloud(g, cloud_x[0], 40);
+        drawCloud(g, cloud_x[1], 50);
+		drawCloud(g, cloud_x[2], 60);
+
+        // Sun
+        g.setColor(Color.YELLOW);
+        paintCircle(600, 40, 37, g);
+
+        // Birds
+        g.setColor(Color.BLACK);
+        for (Bird bird : birdsLeft) drawBird(g, bird.x, bird.y);
+        for (Bird bird : birdsRight) drawBird(g, bird.x, bird.y);
+
+        // Cars
+        g.setColor(Color.RED);
+        drawCar(g, car1X, getHeight() - 110);
+        g.setColor(Color.BLUE);
+        drawCar(g, car2X, getHeight() - 40);
+    }
+
+    private void drawTree(Graphics g, int x, int y) {
+        g.setColor(new Color(139, 69, 19)); // Brown trunk
+        paintBox(x+20, y+60, 10, 40, g);
+        
+        int x1 = x + 25;
+        int y1 = y + 60;
+        
+        g.setColor(Color.GREEN);
+        paintTriangle(x1-30, y1, x1+30, y1, x1, y1-100, g);
+    }
+
+    private void drawCloud(Graphics g, int x, int y) {
+    	g.setColor(Color.WHITE);
+    	
+        paintCircle(x, y+5, 20, g);
+        paintCircle(x+15, y, 20, g);
+        paintCircle(x-15, y, 20, g);
+        paintCircle(x+10, y-10, 20, g);
+        paintCircle(x-10, y-10, 20, g);
+    }
+
+    private void drawBird(Graphics g, int x, int y) {
+        drawLine(x, y, x + 10, y - 10, g);
+        drawLine(x + 10, y - 10, x + 20, y, g);
+    }
+
+    private void drawCar(Graphics g, int x, int y) {
+        paintBox(x, y, 80, 20, g);
+        paintBox(x+10, y-20, 60, 20, g);
+        
+        Color wheel = Color.DARK_GRAY;
+        g.setColor(wheel);
+        paintCircle(x+15, y+20, 10, g);
+        paintCircle(x+65, y+20, 10, g);   
+    }
+
+    private static class Bird {
+        int x, y;
+        boolean goingLeft;
+
+        public Bird(int x, int y, boolean goingLeft) {
+            this.x = x;
+            this.y = y;
+            this.goingLeft = goingLeft;
+        }
+    }
+
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("Animation");
+        frame.add(new MovingCar());
+        frame.setSize(800, 400);
+        frame.setResizable(false);
+        frame.setLocationRelativeTo(null);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+    }
+    
+    public static void paintBox(int x1, int y1, int width, int height, Graphics g) {
+	    for (int i = 0; i < height; i++) {
+	        drawLine(x1, y1 + i, x1 + width, y1 + i, g);
+	    }
+	}
+    
+    public static void drawLine(int x1, int y1, int x2, int y2, Graphics g) {
+		int dx = x2 - x1, dy = y2 - y1;
+		int steps = Math.max(Math.abs(dx), Math.abs(dy));
+		
+		double inc_x = (double) dx / steps;
+		double inc_y = (double) dy / steps;
+		
+		int x =  x1;
+		int y = y1;
+		
+		for(int i = 0; i  <= steps; i++) {
+			g.fillRect(Math.round(x), Math.round(y), 2, 2);
+			
+			x += inc_x;
+			y += inc_y;
+		}
+	}
+    
+    public static void paintCircle(int cx, int cy, int r, Graphics g) {
+		int x = 0, y = r;
+		int p = 1 - r;
+		
+		while(x <= y) {
+			
+			int[] x_p = {cx+x, cx+x, cx-x, cx-x, cx+y, cx+y, cx-y, cx-y};
+			int[] y_p = {cy+y, cy-y, cy+y, cy-y, cy+x, cy-x, cy+x, cy-x};
+			
+			for(int i = 0; i < 8; i++) {
+				g.fillRect(x_p[i], y_p[i], 2, 2);
+				drawLine(x_p[i], y_p[i], cx, cy, g);
+			}
+			
+			x++;
+			
+			if(p < 0) {
+				p += 2 * x + 1;
+			} else {
+				y--;
+				p += 2 * (x - y) + 1;
+			}
+		}
+	}
+    
+    public static void paintTriangle(int x1, int y1, int x2, int y2, int cx, int cy, Graphics g) {
+	    // Sort vertices by their y-coordinates (y1 <= y2 <= cy)
+	    if (y1 > y2) {
+	        int tempX = x1, tempY = y1;
+	        x1 = x2; y1 = y2;
+	        x2 = tempX; y2 = tempY;
+	    }
+	    if (y1 > cy) {
+	        int tempX = x1, tempY = y1;
+	        x1 = cx; y1 = cy;
+	        cx = tempX; cy = tempY;
+	    }
+	    if (y2 > cy) {
+	        int tempX = x2, tempY = y2;
+	        x2 = cx; y2 = cy;
+	        cx = tempX; cy = tempY;
+	    }
+
+	    // Fill the triangle row by row
+	    for (int y = y1; y <= cy; y++) {
+	        int startX = interpolateX(x1, y1, cx, cy, y);
+	        int endX;
+	        if (y < y2) {
+	            endX = interpolateX(x1, y1, x2, y2, y);
+	        } else {
+	            endX = interpolateX(x2, y2, cx, cy, y);
+	        }
+
+	        // Ensure startX is always less than endX
+	        if (startX > endX) {
+	            int temp = startX;
+	            startX = endX;
+	            endX = temp;
+	        }
+
+	        // Draw the horizontal line for the current y
+	        drawLine(startX, y, endX, y, g);
+	    }
+	}
+
+	private static int interpolateX(int x1, int y1, int x2, int y2, int currentY) {
+	    if (y1 == y2) return x1; // Prevent division by zero
+	    double slope = (double) (x2 - x1) / (y2 - y1);
+	    return (int) (x1 + slope * (currentY - y1));
+	}
+}
